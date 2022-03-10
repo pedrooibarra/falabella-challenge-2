@@ -32,7 +32,7 @@ First, please log in into blazemeter.
 - Create a bucket with a friendly name
 - Press the button "Import tests"
 - Choose "Runscope API Tests"
-- Browse and select the file "Api Automation - Falabella.json" located insed of this project
+- Browse and select the file "Api Automation - Falabella.json" located inside of this project
 - Press the button "Import API test"
 - Press "Close" button
 
