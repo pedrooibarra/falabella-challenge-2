@@ -1,0 +1,353 @@
+[ 
+    {
+        "version": "1.0",
+        "exported_at": 1646941845,
+        "name": "[Facts] Iterar sobre p\u00e1ginas al azar de listado de facts",
+        "description": "",
+        "trigger_url": "https://api.runscope.com/radar/e2fe3012-af79-40ff-bcd1-e23cb1df7753/trigger",
+        "steps": [
+            {
+                "step_type": "request",
+                "skipped": false,
+                "note": "Get a list of facts",
+                "auth": {},
+                "multipart_form": [],
+                "headers": {},
+                "method": "GET",
+                "url": "https://catfact.ninja/facts?page={{page}}",
+                "fragment": "",
+                "assertions": [],
+                "variables": [
+                    {
+                        "source": "response_json",
+                        "name": "next_page_url",
+                        "property": "next_page_url"
+                    },
+                    {
+                        "source": "response_json",
+                        "name": "total",
+                        "property": "total"
+                    },
+                    {
+                        "source": "response_json",
+                        "name": "per_page",
+                        "property": "per_page"
+                    }
+                ],
+                "scripts": [
+                    "var page = +variables.get(\"page\");\nvar total = +variables.get(\"total\");\nvar per_page = +variables.get(\"per_page\");\n\nvar max = Math.floor(total/per_page);\n\nif((total%per_page) > 0){\n    max = max + 1;\n}\n\nvar new_page = Math.floor(Math.random() * (max - page + 1) + page)\n\nvariables.set(\"page\", new_page);"
+                ],
+                "before_scripts": []
+            },
+            {
+                "step_type": "condition",
+                "skipped": false,
+                "steps": [
+                    {
+                        "id": "3e6d75d6-ad3c-4279-aa95-3a994eee24bd",
+                        "step_type": "request",
+                        "skipped": false,
+                        "note": "Get a list of facts",
+                        "auth": {},
+                        "multipart_form": [],
+                        "headers": {},
+                        "method": "GET",
+                        "url": "https://catfact.ninja/facts?page={{page}}",
+                        "fragment": "",
+                        "assertions": [
+                            {
+                                "comparison": "equal_number",
+                                "source": "response_json",
+                                "value": "{{page}}",
+                                "property": "current_page"
+                            },
+                            {
+                                "comparison": "not_empty",
+                                "source": "response_json",
+                                "value": null,
+                                "property": "data"
+                            }
+                        ],
+                        "variables": [
+                            {
+                                "source": "response_json",
+                                "name": "next_page_url",
+                                "property": "next_page_url"
+                            }
+                        ],
+                        "scripts": [
+                            "var page = variables.get(\"page\");\nvariables.set(\"id\", page++);"
+                        ],
+                        "before_scripts": []
+                    }
+                ],
+                "comparison": "not_equal",
+                "left_value": "{{next_page_url}}",
+                "right_value": "null"
+            }
+        ]
+    }, 
+    {
+        "version": "1.0",
+        "exported_at": 1646941845,
+        "name": "[Facts] Obtener todos los facts y verificar que no exista p\u00e1gina previa ni siguiente en la respuesta",
+        "description": "",
+        "trigger_url": "https://api.runscope.com/radar/0dd438ad-cbea-4887-8063-ff30b0f239f0/trigger",
+        "steps": [
+            {
+                "step_type": "request",
+                "skipped": false,
+                "note": "Get a list of facts",
+                "auth": {},
+                "multipart_form": [],
+                "headers": {},
+                "method": "GET",
+                "url": "https://catfact.ninja/facts",
+                "fragment": "",
+                "assertions": [
+                    {
+                        "comparison": "is_a_number",
+                        "source": "response_json",
+                        "value": null,
+                        "property": "total"
+                    }
+                ],
+                "variables": [
+                    {
+                        "source": "response_json",
+                        "name": "total",
+                        "property": "total"
+                    }
+                ],
+                "scripts": [],
+                "before_scripts": []
+            },
+            {
+                "step_type": "request",
+                "skipped": false,
+                "note": "Get a list of facts",
+                "auth": {},
+                "multipart_form": [],
+                "headers": {},
+                "method": "GET",
+                "url": "https://catfact.ninja/facts?max_length=59020377&limit={{total}}",
+                "fragment": "",
+                "assertions": [
+                    {
+                        "comparison": "is_null",
+                        "source": "response_json",
+                        "value": null,
+                        "property": "next_page_url"
+                    },
+                    {
+                        "comparison": "is_null",
+                        "source": "response_json",
+                        "value": null,
+                        "property": "prev_page_url"
+                    },
+                    {
+                        "comparison": "equal",
+                        "source": "response_json",
+                        "value": "{{total}}",
+                        "property": "per_page"
+                    }
+                ],
+                "variables": [],
+                "scripts": [],
+                "before_scripts": []
+            }
+        ]
+    }, 
+    {
+        "version": "1.0",
+        "exported_at": 1646941845,
+        "name": "[Facts] Obtener fact de largo 20 y buscar si existe en listado de facts",
+        "description": "",
+        "trigger_url": "https://api.runscope.com/radar/911b5f88-a505-4237-b7a5-e663f89cc356/trigger",
+        "steps": [
+            {
+                "step_type": "request",
+                "skipped": false,
+                "note": "Get a list of facts",
+                "auth": {},
+                "multipart_form": [],
+                "headers": {},
+                "method": "GET",
+                "url": "https://catfact.ninja/fact?max_length=20",
+                "fragment": "",
+                "assertions": [
+                    {
+                        "comparison": "not_empty",
+                        "source": "response_json",
+                        "value": null,
+                        "property": "fact"
+                    },
+                    {
+                        "comparison": "is_a_number",
+                        "source": "response_json",
+                        "value": null,
+                        "property": "length"
+                    }
+                ],
+                "variables": [
+                    {
+                        "source": "response_json",
+                        "name": "fact1",
+                        "property": "fact"
+                    },
+                    {
+                        "source": "response_json",
+                        "name": "length1",
+                        "property": "length"
+                    }
+                ],
+                "scripts": [
+                    ""
+                ],
+                "before_scripts": []
+            },
+            {
+                "step_type": "request",
+                "skipped": false,
+                "note": "Get a list of facts",
+                "auth": {},
+                "multipart_form": [],
+                "headers": {},
+                "method": "GET",
+                "url": "https://catfact.ninja/facts?max_length=20&limit=20",
+                "fragment": "",
+                "assertions": [
+                    {
+                        "comparison": "equal",
+                        "source": "response_json",
+                        "value": "{{fact1}}",
+                        "property": "data.[0].fact"
+                    },
+                    {
+                        "comparison": "equal_number",
+                        "source": "response_json",
+                        "value": "{{length1}}",
+                        "property": "data.[0].length"
+                    }
+                ],
+                "variables": [],
+                "scripts": [],
+                "before_scripts": []
+            }
+        ]
+    }, 
+    {
+        "version": "1.0",
+        "exported_at": 1646941845,
+        "name": "[Facts] Obtener random fact y buscar si existe en listado de facts",
+        "description": "",
+        "trigger_url": "https://api.runscope.com/radar/e3480281-9ce4-4843-b6ab-aafa04d51de6/trigger",
+        "steps": [
+            {
+                "step_type": "request",
+                "skipped": false,
+                "note": "Get a list of facts",
+                "auth": {},
+                "multipart_form": [],
+                "headers": {},
+                "method": "GET",
+                "url": "https://catfact.ninja/fact",
+                "fragment": "",
+                "assertions": [
+                    {
+                        "comparison": "not_empty",
+                        "source": "response_json",
+                        "value": null,
+                        "property": "fact"
+                    },
+                    {
+                        "comparison": "is_a_number",
+                        "source": "response_json",
+                        "value": null,
+                        "property": "length"
+                    }
+                ],
+                "variables": [
+                    {
+                        "source": "response_json",
+                        "name": "fact",
+                        "property": "fact"
+                    },
+                    {
+                        "source": "response_json",
+                        "name": "length",
+                        "property": "length"
+                    }
+                ],
+                "scripts": [
+                    ""
+                ],
+                "before_scripts": []
+            },
+            {
+                "step_type": "request",
+                "skipped": false,
+                "note": "Get a list of facts",
+                "auth": {},
+                "multipart_form": [],
+                "headers": {},
+                "method": "GET",
+                "url": "https://catfact.ninja/facts?max_length={{length}}&limit=59020377",
+                "fragment": "",
+                "assertions": [
+                    {
+                        "comparison": "not_empty",
+                        "source": "response_json",
+                        "value": null,
+                        "property": "data"
+                    }
+                ],
+                "variables": [],
+                "scripts": [
+                    "// parse JSON response body into object\r\nvar body = JSON.parse(response.body);\r\n\r\nvar fact = variables.get(\"fact\");\r\n\r\n// check an array for the presence of an item\r\nvar exists = false;\r\nvar facts = body.data;\r\nfor (var f in facts) {\r\n    if (facts[f].fact === fact) {\r\n        exists = true;\r\n        break;\r\n    }\r\n}\r\n\r\nassert.ok(exists, \"fact \" + fact + \" exists\");"
+                ],
+                "before_scripts": []
+            }
+        ]
+    }, 
+    {
+        "version": "1.0",
+        "exported_at": 1646941845,
+        "name": "[Fact] Validar largo de un random fact",
+        "description": "",
+        "trigger_url": "https://api.runscope.com/radar/b343aa30-a621-4143-aab0-39a7346b0c25/trigger",
+        "steps": [
+            {
+                "step_type": "request",
+                "skipped": false,
+                "note": "Get a list of facts",
+                "auth": {},
+                "multipart_form": [],
+                "headers": {},
+                "method": "GET",
+                "url": "https://catfact.ninja/fact",
+                "fragment": "",
+                "assertions": [
+                    {
+                        "comparison": "not_empty",
+                        "source": "response_json",
+                        "value": null,
+                        "property": "fact"
+                    },
+                    {
+                        "comparison": "is_a_number",
+                        "source": "response_json",
+                        "value": null,
+                        "property": "length"
+                    }
+                ],
+                "variables": [],
+                "scripts": [
+                    "// parse JSON response body into object\r\nvar data = JSON.parse(response.body);\r\n\r\nassert.ok(data.fact.length, data.length)"
+                ],
+                "before_scripts": []
+            }
+        ]
+    }
+] 
+
